@@ -1,0 +1,21 @@
+{
+  "name": "serverless-eventing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "serverless-http": "^1.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "node web-local.js 3333"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
