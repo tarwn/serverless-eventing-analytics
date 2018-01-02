@@ -1,0 +1,17 @@
+#log{
+    position: relative;
+    border: 1px solid #dddddd;
+    margin: 1.5em 1em;
+    padding: 1.75em 1em 1em 1em;
+}
+#log:before{
+    content: "Log";
+    position: absolute;
+    top: -10px;
+    height: 20px;
+    line-height: 20px;
+
+    background-color: white;
+    border: 1px solid #dddddd;
+    padding: 0 .25em;
+}

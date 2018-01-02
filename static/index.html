@@ -2,8 +2,45 @@
 <html>
 <head>
     <title>Hello index.html</title>
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <h1>Test complete</h1>
+    <div id="buttons"></div>
+    <div id="log"></div>
+
+    <script>
+        var logId = 0;
+        function log(message, parentId){
+            var localId = (parentId != null ? parentId : ++logId);
+            $("#log").prepend("<div>" + localId + ": " + new Date().toISOString() + " - " + message + "</div>");
+            return localId;
+        }
+
+        $().ready(function(){
+            $("#buttons").append("<input type='button' id='btnTestEvent' value='Fire Test Event' />");
+            $("#btnTestEvent").on("click", function(){
+                var data = JSON.stringify({ "eventType": "test-event", "client-side-time": new Date() });
+                var logId = log("Sending: " + data);
+                $.ajax({
+                    type: "POST",
+                    url: "/event-api/events",
+                    contentType: "application/json; charset=utf-8",
+                    data: data,
+                    success: function(data){
+                        log("Success: " + data, logId);
+                    },
+                    error: function(jqXHR, status, error){
+                        log("Error: " + jqXHR.status + " " + status, logId);
+                    }
+                });
+            });
+
+        });
+    </script>
 </body>
 </html>
