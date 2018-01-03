@@ -1,6 +1,11 @@
 # package directories
 node_modules
 jspm_packages
+npm-debug.log
 
 # Serverless directories
 .serverless
+
+# Secrets
+config/variables.yml
+config/env.yml
