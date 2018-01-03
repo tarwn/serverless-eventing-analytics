@@ -1,14 +1,44 @@
 service: serverless-eventing
 
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-offline-kinesis-events
+
+custom:
+  defaults:
+    log_level: INFO
+    stage: dev
+  config: ${file(./config/variables.yml):${opt:stage, self:custom.defaults.stage}}
+  offlineKinesisEvents:
+    host: localhost
+    port: 4567
+    region: ${self:provider.region}
+    # How often to poll the Kinesis stream
+    intervalMillis: 5000
+
 provider:
   name: aws
   runtime: nodejs6.10
-  stage: dev
+  stage: ${opt:stage, self:custom.defaults.stage}
   region: us-east-1
-
+  environment: ${file(./config/variables.yml):${opt:stage, self:custom.defaults.stage}}
+  
 functions:
   app:
     handler: web-handler.handler
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+
+  ruleProcessor:
+    private: true
+    handler: rule-processor.handler
+    # memorySize: 128
+    # timeout: 10
+    events:
+      - stream:
+          type: kinesis
+          arn: ${self:custom.config.streamArn}
+          batchSize: 100
+          startingPosition: LATEST

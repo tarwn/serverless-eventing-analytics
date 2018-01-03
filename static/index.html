@@ -28,7 +28,7 @@
                 var logId = log("Sending: " + data);
                 $.ajax({
                     type: "POST",
-                    url: "/event-api/events",
+                    url: "event-api/events",
                     contentType: "application/json; charset=utf-8",
                     data: data,
                     success: function(data){

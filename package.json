@@ -10,10 +10,14 @@
     "express": "^4.16.2",
     "serverless-http": "^1.5.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "aws-sdk": "^2.176.0",
+    "serverless-offline": "^3.16.0",
+    "serverless-plugin-offline-kinesis-events": "^1.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "node web-local.js 3333"
+    "offline": "serverless offline start --exec 'node ./local/bootstrap.js'"
   },
   "keywords": [],
   "author": "",
