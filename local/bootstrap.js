@@ -1,20 +1,14 @@
 var AWS = require('aws-sdk');
+require('dotenv').config({ path: './config/offline.env' });
 
-// variables
-const kinesis_host = "localhost",
-    kinesis_port = 4567,
-    kinesis_region = "us-east-1",
-    kinesis_stream_name = "elistream";
-
-    
 const kinesis = new AWS.Kinesis({
-    endpoint: `${kinesis_host}:${kinesis_port}`,
-    region: kinesis_region,
+    endpoint: `${process.env.KINESIS_HOST}:${process.env.KINESIS_PORT}`,
+    region: process.env.KINESIS_REGION,
     apiVersion: '2013-12-02',
     sslEnabled: false
 });
 
-var req = kinesis.createStream({ ShardCount: 1, StreamName: kinesis_stream_name });
+var req = kinesis.createStream({ ShardCount: 1, StreamName: process.env.KINESIS_STREAM_NAME });
 req.send(function (err, data) { 
     if (err) {
         if (err.code === 'ResourceInUseException') {

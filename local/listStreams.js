@@ -1,13 +1,10 @@
 var AWS = require('aws-sdk');
 
-// variables
-const kinesis_host = "localhost",
-    kinesis_port = 4567,
-    kinesis_region = "us-east-1";
+require('dotenv').config({ path: './config/offline.env' });
 
 const kinesis = new AWS.Kinesis({
-    endpoint: `${kinesis_host}:${kinesis_port}`,
-    region: kinesis_region,
+    endpoint: `${process.env.KINESIS_HOST}:${process.env.KINESIS_PORT}`,
+    region: process.env.KINESIS_REGION,
     apiVersion: '2013-12-02',
     sslEnabled: false
 });

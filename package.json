@@ -8,16 +8,20 @@
   },
   "dependencies": {
     "express": "^4.16.2",
-    "serverless-http": "^1.5.2"
+    "serverless-http": "^1.5.2",
+    "aws-sdk": "^2.176.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.176.0",
-    "serverless-offline": "^3.16.0",
-    "serverless-plugin-offline-kinesis-events": "^1.0.0"
+    "@rabblerouser/local-kinesis-lambda-runner": "^0.2.5",
+    "concurrently": "^3.5.1",
+    "dotenv": "^4.0.0",
+    "serverless-offline": "^3.16.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "offline": "serverless offline start --exec 'node ./local/bootstrap.js'"
+    "offline:bootstrap": "node local/bootstrap.js",
+    "offline:functions": "concurrently --kill-others \"serverless offline start\" \"node local/runStreamHandler.js\"",
+    "offline": "npm run offline:bootstrap && npm run offline:functions"
   },
   "keywords": [],
   "author": "",
