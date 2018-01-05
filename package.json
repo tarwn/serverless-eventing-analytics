@@ -20,9 +20,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "offline:bootstrap": "node offlineStreams/bootstrap.js",
-    "offline:functions": "concurrently --kill-others \"serverless offline start --stage offline\" \"node offlineStreams/runOfflineStreamHandlers.js\"",
-    "offline": "npm run offline:bootstrap && npm run offline:functions"
+    "offline": "concurrently --names \"KINE,BOOT,HTTP,STRM\" -c \"bgGreen.bold,bgGreen.bold,bgBlue.bold,bgMagenta.bold\" --kill-others-on-fail \"kinesalite\" \"node offlineStreams/bootstrap.js\" \"serverless offline start --stage offline\" \"node offlineStreams/runOfflineStreamHandlers.js\""
   },
   "keywords": [],
   "author": "",
