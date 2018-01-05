@@ -1,6 +1,7 @@
 var AWS = require('aws-sdk');
+const envFromYaml = require('./utils/envFromYaml');
 
-require('dotenv').config({ path: './config/offline.env' });
+envFromYaml.config('./config/env.yml','offline');
 
 const kinesis = new AWS.Kinesis({
     endpoint: `${process.env.KINESIS_HOST}:${process.env.KINESIS_PORT}`,

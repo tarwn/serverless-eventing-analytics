@@ -15,11 +15,11 @@ provider:
   runtime: nodejs6.10
   stage: ${opt:stage, self:custom.defaults.stage}
   region: us-east-1
-  environment: ${file(./config/offline.yml)}
+  environment: ${file(./config/env.yml):${opt:stage, self:custom.defaults.stage}}
   
 functions:
   app:
-    handler: web-handler.handler
+    handler: functions.httpApp
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
@@ -27,7 +27,7 @@ functions:
   # does not run via serverless-offline
   ruleProcessor:
     private: true
-    handler: stream-handler.handler
+    handler: functions.streamRuleProcessor
     # memorySize: 128
     # timeout: 10
     events:

@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk');
-const pollKinesis = require('./pollKinesis');
+const pollKinesis = require('./utils/pollKinesis');
+const envFromYaml = require('./utils/envFromYaml');
 
-require('dotenv').config({ path: './config/offline.env' });
+envFromYaml.config('./config/env.yml','offline');
 
 const kinesis = new AWS.Kinesis({
     endpoint: `${process.env.KINESIS_HOST}:${process.env.KINESIS_PORT}`,
@@ -17,5 +18,5 @@ const log = {
 
 const run = pollKinesis(kinesis, process.env.KINESIS_STREAM_NAME, log);
 
-const lambda = require('../stream-handler').handler;
+const lambda = require('../functions').streamRuleProcessor;
 run(lambda);

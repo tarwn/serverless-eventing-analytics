@@ -1,4 +1,0 @@
-KINESIS_HOST: 'localhost'
-KINESIS_PORT: 4567
-KINESIS_REGION: 'us-east-1'
-KINESIS_STREAM_NAME: 'offline-example'
