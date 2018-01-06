@@ -18,8 +18,24 @@ provider:
   environment: ${file(./config/env.yml):${opt:stage, self:custom.defaults.stage}}
   
 functions:
-  app:
-    handler: functions.httpApp
+  rulesApi:
+    handler: functions/rulesApi/handler.httpApp
+    events:
+      - http:
+          method: GET
+          path: rules/getAll
+          cors: true
+      - http:
+          method: POST
+          path: rules
+          cors: true
+      - http:
+          method: GET
+          path: alerts/getAll
+          cors: true
+
+  debugApp:
+    handler: functions/debugWeb/handler.httpApp
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
@@ -27,7 +43,7 @@ functions:
   # does not run via serverless-offline
   ruleProcessor:
     private: true
-    handler: functions.streamRuleProcessor
+    handler: functions/ruleProcessor/handler.streamProcessor
     # memorySize: 128
     # timeout: 10
     events:

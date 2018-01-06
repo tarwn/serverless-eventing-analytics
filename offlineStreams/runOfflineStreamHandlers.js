@@ -18,5 +18,5 @@ function getLog(functionName) {
     };
 }    
 
-const lambda = require('../functions').streamRuleProcessor;
+const lambda = require('../functions/ruleProcessor/handler').streamProcessor;
 run(lambda, { kinesis: kinesis, streamName: process.env.KINESIS_STREAM_NAME, console: getLog('RuleProcessor') });

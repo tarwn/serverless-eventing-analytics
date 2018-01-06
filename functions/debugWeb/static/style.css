@@ -15,3 +15,17 @@
     border: 1px solid #dddddd;
     padding: 0 .25em;
 }
+
+.machine{
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    border: 2px solid #dddddd;
+}
+.machine.running{
+    border: 2px solid green;
+}
+.machine.sprinting{
+    border: 2px solid yellow;
+}
+
