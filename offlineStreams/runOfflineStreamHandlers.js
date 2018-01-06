@@ -11,12 +11,15 @@ const kinesis = new AWS.Kinesis({
     sslEnabled: false
 });
 
-const log = {
-    log: (m) => console.log("\nStreamHandler: " + m),
-    error: (e) => console.error("\nStreamHandler: ", e)
-};
+function startFunction(functionName, streamName, lambda) {
+    const log = {
+        log: (m) => console.log(`\n${functionName}: ${m}`),
+        error: (e) => console.error(`\n${functionName}:`, e)
+    };
 
-const run = pollKinesis(kinesis, process.env.KINESIS_STREAM_NAME, log);
+    const run = pollKinesis(kinesis, streamName, log);
+    run(lambda);
+}
 
-const lambda = require('../functions').streamRuleProcessor;
-run(lambda);
+// Kinesis functions
+startFunction('RuleProcessor', process.env.KINESIS_STREAM_NAME, require('../functions').streamRuleProcessor);
