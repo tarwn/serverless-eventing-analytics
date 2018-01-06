@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const pollKinesis = require('./utils/pollKinesis');
+const run = require('@rabblerouser/local-kinesis-lambda-runner');
 const envFromYaml = require('./utils/envFromYaml');
 
 envFromYaml.config('./config/env.yml','offline');
@@ -11,12 +11,12 @@ const kinesis = new AWS.Kinesis({
     sslEnabled: false
 });
 
-const log = {
-    log: (m) => console.log("\nStreamHandler: " + m),
-    error: (e) => console.error("\nStreamHandler: ", e)
-};
-
-const run = pollKinesis(kinesis, process.env.KINESIS_STREAM_NAME, log);
+function getLog(functionName) {
+    return {
+        log: (m) => console.log(`\n${functionName}: ${m}`),
+        error: (e) => console.error(`\n${functionName}:`, e)
+    };
+}    
 
 const lambda = require('../functions').streamRuleProcessor;
-run(lambda);
+run(lambda, { kinesis: kinesis, streamName: process.env.KINESIS_STREAM_NAME, console: getLog('RuleProcessor') });
