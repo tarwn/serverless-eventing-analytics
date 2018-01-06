@@ -5,9 +5,9 @@
 module.exports = (kinesis, StreamName, logger) => {
     const wait = ms => () => new Promise(resolve => setTimeout(resolve, ms));
   
-    const callback = (err, result) => (
-      err ? logger.error('Handler failed:', err.message) : logger.log('Handler suceeded:', result)
-    );
+  const callback = (err, result) => (
+    err ? logger.error('Handler failed:' + err.message) : logger.log('Handler suceeded: ' + result)
+  );
   
     const mapKinesisRecord = record => ({
       data: record.Data.toString('base64'),
