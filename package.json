@@ -12,7 +12,7 @@
     "aws-sdk": "^2.176.0"
   },
   "devDependencies": {
-    "@rabblerouser/local-kinesis-lambda-runner": "^0.2.5",
+    "@rabblerouser/local-kinesis-lambda-runner": "https://github.com/tarwn/local-kinesis-lambda-runner.git",
     "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",
     "js-yaml": "^3.10.0",
