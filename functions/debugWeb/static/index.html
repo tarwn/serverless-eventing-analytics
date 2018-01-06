@@ -9,64 +9,120 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Client #1</h1>
-    <div id="machines">
-        <div class="machine" data-machineId="machine-01" data-clientId="client-01">1-1</div>
-        <div class="machine" data-machineId="machine-02" data-clientId="client-01">1-2</div>
-        <div class="machine" data-machineId="machine-03" data-clientId="client-01">1-3</div>
-        <div class="machine" data-machineId="machine-04" data-clientId="client-01">1-4</div>
-        <div class="machine" data-machineId="machine-05" data-clientId="client-01">1-5</div>
-    </div>
-    <h1>Client #2</h1>
-    <div id="machines">
-        <div class="machine" data-machineId="machine-01" data-clientId="client-01">1-1</div>
-        <div class="machine" data-machineId="machine-02" data-clientId="client-01">1-2</div>
-        <div class="machine" data-machineId="machine-03" data-clientId="client-01">1-3</div>
-        <div class="machine" data-machineId="machine-04" data-clientId="client-01">1-4</div>
-        <div class="machine" data-machineId="machine-05" data-clientId="client-01">1-5</div>
-    </div>
+    <h1>Clients</h1>
+    <div id="clients"></div>
+
     <h1>Behind the scenes</h1>
     <div id="buttons"></div>
     <div id="log"></div>
 
     <script>
         var logId = 0;
+        var isRunning = false;
         function log(message, parentId){
-            var localId = (parentId != null ? parentId : ++logId);
-            $("#log").prepend("<div>" + localId + ": " + new Date().toISOString() + " - " + message + "</div>");
-            return localId;
+            if (parentId != null) {
+                $("#log-" + parentId).append("<div class='response'>" + new Date().toISOString() + " - " + message + "</div>")
+                return parentId;
+            }
+            else {
+                var localId = ++logId;
+                $("#log").prepend("<div class='logEntry " + (localId % 2 == 1 ? "odd" : "") + "' id='log-" + localId + "'><div><span class='logId'>" + localId + "</span>" + new Date().toISOString() + " - " + message + "</div></div>");
+                return localId;
+            }
+        }
+        
+        function publishEvent(event,){
+            var data = JSON.stringify(event);
+            var logId = log("Sending: " + data);
+            $.ajax({
+                type: "POST",
+                url: "event-api/events",
+                contentType: "application/json; charset=utf-8",
+                data: data,
+                success: function(data){
+                    log("Success: " + data, logId);
+                },
+                error: function(jqXHR, status, error){
+                    log("Error: " + jqXHR.status + " " + status, logId);
+                }
+            });
         }
 
         $().ready(function(){
             $("#buttons").append("<input type='button' id='btnTestEvent' value='Fire Test Event' />");
             $("#btnTestEvent").on("click", function(){
-                var data = JSON.stringify({ "eventType": "test-event", "client-side-time": new Date() });
-                var logId = log("Sending: " + data);
-                $.ajax({
-                    type: "POST",
-                    url: "event-api/events",
-                    contentType: "application/json; charset=utf-8",
-                    data: data,
-                    success: function(data){
-                        log("Success: " + data, logId);
-                    },
-                    error: function(jqXHR, status, error){
-                        log("Error: " + jqXHR.status + " " + status, logId);
-                    }
-                });
+                var evt = { "eventType": "test-event", "clientSideTime": new Date() };
+                publishEvent(evt);
             });
 
+            $("#buttons").append("<input type='button' id='btnToggleAnimation' value='Stop Running' />");
+            $("#btnToggleAnimation").click(function(){
+                if(isRunning){
+                    isRunning = false;
+                    $(this).val("Start running");
+                }
+                else{
+                    isRunning = true;
+                    $(this).val("Stop running");
+                }
+            });
         });
 
         $().ready(function(){
+            // setup clients and machines
             var data = { clients: [] };
             data.clients.push({ clientId: "client-01", machines: [], rules: [] });
             data.clients.push({ clientId: "client-02", machines: [], rules: [] });
 
             data.clients.forEach(function(c){
-               // c.machines = 
+                c.machines = [
+                    { machineId: 'machine-01', status: 'stopped' },
+                    { machineId: 'machine-02', status: 'stopped' },
+                    { machineId: 'machine-03', status: 'stopped' },
+                    { machineId: 'machine-04', status: 'stopped' },
+                    { machineId: 'machine-05', status: 'stopped' }
+                ];
+
+                var client = $('#clients').append("<div id='" + c.clientId + "'></div>");
+                client.append("<div class='container-label'>" + c.clientId + "</div>")
+                c.machines.forEach(function(m){
+                    client.append("<div class='machine' id='" + c.clientId + "-" + m.machineId + "'>" + m.machineId + "</div>");
+                });
             });
+
+            // begin running machines - same sequence of events for both clients
+            isRunning = true;
+            animate();
+
+            function animate(){
+                if(isRunning){
+                    var i = Math.floor(Math.random() * 5);
+                    switch(data.clients[0].machines[i].status){
+                        case 'stopped':
+                            machineStatusChange(data.clients[0], data.clients[0].machines[i], "starting");
+                            machineStatusChange(data.clients[1], data.clients[1].machines[i], "starting");
+                            break;
+                        case 'starting':
+                            machineStatusChange(data.clients[0], data.clients[0].machines[i], "running");
+                            machineStatusChange(data.clients[1], data.clients[1].machines[i], "running");
+                            break;
+                        case 'running':
+                            machineStatusChange(data.clients[0], data.clients[0].machines[i], "stopped");
+                            machineStatusChange(data.clients[1], data.clients[1].machines[i], "stopped");
+                            break;
+                    }
+                }
+
+                setTimeout(animate, 5000);
+            }
+
+            function machineStatusChange(client, machine, newStatus){
+                machine.status = newStatus;
+                $('#' + client.clientId + "-" + machine.machineId).attr('class','machine ' + newStatus);
+                publishEvent({ "eventType": "machineStatusChange", "state": newStatus, "clientSideTime": new Date(), "clientId": client.clientId, "machineId": machine.machineId });
+            }
         });
+
     </script>
 </body>
 </html>

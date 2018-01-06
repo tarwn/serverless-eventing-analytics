@@ -2,30 +2,53 @@
     position: relative;
     border: 1px solid #dddddd;
     margin: 1.5em 1em;
-    padding: 1.75em 1em 1em 1em;
+    padding: 1.75em 0 1em 0;
 }
 #log:before{
     content: "Log";
     position: absolute;
     top: -10px;
+    left: 10px;
     height: 20px;
     line-height: 20px;
 
     background-color: white;
     border: 1px solid #dddddd;
     padding: 0 .25em;
+    z-index: 100;
 }
+.logEntry{
+    padding: .25em .5em;
+    white-space: nowrap;
+}
+.logEntry.odd{
+    background-color: #dddddd;
+}
+
+.logId{
+    display: inline-block;
+    width: 3em;
+}
+.response{
+    padding-left: 3em;
+}
+
 
 .machine{
     display: inline-block;
     height: 60px;
     width: 60px;
     border: 2px solid #dddddd;
+    margin: .25em;
+}
+.machine.starting{
+    border: 2px solid yellowgreen;
 }
 .machine.running{
     border: 2px solid green;
 }
 .machine.sprinting{
-    border: 2px solid yellow;
+    border: 2px solid orange;
 }
+
 
