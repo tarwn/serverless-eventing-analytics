@@ -6,6 +6,9 @@
   "directories": {
     "test": "tests"
   },
+  "engines" : { 
+    "node" : ">=6.5 <=6.12.3" 
+  },
   "dependencies": {
     "express": "^4.16.2",
     "serverless-http": "^1.5.2",
@@ -13,13 +16,15 @@
   },
   "devDependencies": {
     "@rabblerouser/local-kinesis-lambda-runner": "git+https://github.com/tarwn/local-kinesis-lambda-runner.git#package",
+    "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",
     "js-yaml": "^3.10.0",
+    "mocha": "^4.1.0",
     "serverless-offline": "^3.16.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests/**/*.js",
     "offline": "concurrently --names \"KNSL,BOOT,HTTP,STRM\" -c \"bgGreen.bold,bgGreen.bold,bgBlue.bold,bgMagenta.bold\" --kill-others-on-fail \"kinesalite\" \"node offlineStreams/bootstrap.js\" \"serverless offline start --stage offline\" \"node offlineStreams/runOfflineStreamHandlers.js\""
   },
   "keywords": [],

@@ -30,7 +30,7 @@ module.exports = function() {
         var putReq = kinesis.putRecord({
             Data: JSON.stringify(incomingEvent),
             PartitionKey: '0',
-            StreamName: process.env.KINESIS_STREAM_NAME
+            StreamName: process.env.KINESIS_STREAM_NAME_EVENTS
         }, function (err, data) { 
             if (err) {
                 //TODO: details somewhere

@@ -10,7 +10,8 @@ const kinesis = new AWS.Kinesis({
     sslEnabled: false
 });
 
-ensureStreamExists(kinesis, process.env.KINESIS_STREAM_NAME);
+ensureStreamExists(kinesis, process.env.KINESIS_STREAM_NAME_EVENTS);
+ensureStreamExists(kinesis, process.env.KINESIS_STREAM_NAME_ALERTS);
 
 function ensureStreamExists(kinesis, streamName){
     var req = kinesis.createStream({ ShardCount: 1, StreamName: streamName });

@@ -1,7 +1,10 @@
 ---
 offline:
-  streamArn: 'arn:aws:kinesis:us-east-1:example:stream/offline-example'
+  eventsStreamArn: 'arn:aws:kinesis:us-east-1:example:stream/offline-events'
+  alertsStreamArn: 'arn:aws:kinesis:us-east-1:example:stream/offline-alerts'
   
 dev:
-  streamArn:
+  eventsStreamArn: 
+    'Fn::ImportValue': 'some-other-service:${self:provider.stage}:StreamARN'
+  alertsStreamArn: 
     'Fn::ImportValue': 'some-other-service:${self:provider.stage}:StreamARN'

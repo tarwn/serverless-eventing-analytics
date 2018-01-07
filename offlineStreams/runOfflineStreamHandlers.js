@@ -14,9 +14,14 @@ const kinesis = new AWS.Kinesis({
 function getLog(functionName) {
     return {
         log: (m) => console.log(`\n${functionName}: ${m}`),
-        error: (e) => console.error(`\n${functionName}:`, e)
+        error: (e) => console.error(`\n${functionName}:`, e.message, e.stack)
     };
 }    
 
-const lambda = require('../functions/ruleProcessor/handler').streamProcessor;
-run(lambda, { kinesis: kinesis, streamName: process.env.KINESIS_STREAM_NAME, console: getLog('RuleProcessor') });
+const ruleLambda = require('../functions/ruleProcessor/handler').streamProcessor;
+run(ruleLambda, { kinesis: kinesis, streamName: process.env.KINESIS_STREAM_NAME_EVENTS, console: getLog('RuleProcessor') });
+
+const alertLambda = require('../functions/alertProcessor/handler').streamProcessor;
+run(ruleLambda, { kinesis: kinesis, streamName: process.env.KINESIS_STREAM_NAME_ALERTS, console: getLog('AlertProcessor') });
+
+
