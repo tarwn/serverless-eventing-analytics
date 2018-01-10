@@ -30,6 +30,10 @@ class Rule {
         //      count: (count)
         return false;
     }
+
+    getAlertFor(result){
+        return { alertType: 'fake alert', ruleId: result.ruleId, clientId: result.clientId };
+    }
 }
 
 class RuleParameter { 

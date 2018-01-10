@@ -6,8 +6,8 @@
   "directories": {
     "test": "tests"
   },
-  "engines" : { 
-    "node" : ">=6.5 <=6.12.3" 
+  "engines": {
+    "node": ">=6.5 <=6.12.3"
   },
   "dependencies": {
     "express": "^4.16.2",
@@ -21,6 +21,7 @@
     "dotenv": "^4.0.0",
     "js-yaml": "^3.10.0",
     "mocha": "^4.1.0",
+    "serverless-dynalite": "^1.2.0",
     "serverless-offline": "^3.16.0"
   },
   "scripts": {

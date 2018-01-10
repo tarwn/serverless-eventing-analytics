@@ -10,22 +10,33 @@ module.exports.streamProcessor = (kinesisEvent, context, callback) => {
 
     let alertCount = 0;
 
-    eventGroups.forEach((eventGroup) => { 
+    Promise.all(eventGroups.map((eventGroup) => { 
         const clientRules = rules.get(eventGroup.clientId);
         const localResults = helper.applyRules(clientRules, eventGroup);
 
         // open stored buckets to apply local values + evaluate for alerts
-        Object.keys(localResults).forEach((uniqueResultKey) => { 
-            const appliedRule = clientRules.find((cr) => cr.ruleId = completeResult.ruleId);
-            const completeResult = results.applyLocalResultToStoredResult(localResults[uniqueResultKey], rule);
-            if (appliedRule.meetsConditions(updatedResults)) { 
-                publishAlert(rule.getAlertFor(updatedResults));
-                alertCount++;
-            }
-        });
+        return Promise.all(Object.keys(localResults).map((uniqueResultKey) => { 
+            const appliedRule = clientRules.find((cr) => cr.ruleId = localResults[uniqueResultKey].ruleId);
+            return results.applyLocalResultToStoredResult(localResults[uniqueResultKey], appliedRule)
+                .then((completeResult) => {
+                    if (appliedRule.meetsConditionsFor(completeResult)) { 
+                        publishAlert(rule.getAlertFor(completeResult));
+                        alertCount++;
+                        console.log(`ALERTED for ${completeResult.uniqueResultKey}`);
+                    }
+                    else{
+                        console.log(`No alerts for ${completeResult.uniqueResultKey}`);
+                    }
+                });
+        }));
+    }))
+    .catch((err) => {
+        console.log(err);
+        callback(err, 'message');
+    })
+    .then(() => {
+        callback(null, `Successfully processed ${kinesisEvent.Records.length} records for ${eventGroups.length} clients, resulting in ${alertCount} alerts`);
     });
-
-    callback(null, `Successfully processed ${kinesisEvent.Records.length} records for ${eventGroups.length} clients, resulting in ${alertCount} alerts`);
 };
 
 function publishAlert(alert) { 

@@ -3,12 +3,17 @@ service: serverless-eventing
 
 plugins:
   - serverless-offline
+  - serverless-dynalite
 
 custom:
   defaults:
     log_level: INFO
     stage: dev
   config: ${file(./config/variables.yml):${opt:stage, self:custom.defaults.stage}}
+  dynalite:
+    start:
+      port: ${self:provider.environment.DYNAMODB_PORT}
+      region: ${self:provider.environment.DYNAMODB_REGION}
 
 provider:
   name: aws
@@ -64,3 +69,34 @@ functions:
           arn: ${self:custom.config.alertsStreamArn}
           batchSize: 100
           startingPosition: LATEST
+
+resources:  
+  Resources:
+    ResultsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_NAME_RESULTS}
+        AttributeDefinitions:
+          - AttributeName: unique_result_key
+            AttributeType: S
+        KeySchema:
+          - AttributeName: unique_result_key
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    DynamoDBIamPolicy:
+      Type: AWS::IAM::Policy
+      DependsOn: DynamoDbTable
+      Properties:
+        PolicyName: lambda-dynamodb
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+              Resource: arn:aws:dynamodb:*:*:table/${self:provider.environment.DYNAMODB_TABLE_NAME_RESULTS}
+        Roles:
+          - Ref: IamRoleLambdaExecution

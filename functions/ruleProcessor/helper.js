@@ -4,7 +4,7 @@ var Result = require("./lib/result");
 
 module.exports.extractEventsFromKinesisEvent = (kinesisEvent) => {
     return kinesisEvent.Records.map((record) => {
-        return new Buffer(record.kinesis.data, 'base64').toString('ascii');
+        return JSON.parse(new Buffer(record.kinesis.data, 'base64').toString('ascii'));
     });
 };
 

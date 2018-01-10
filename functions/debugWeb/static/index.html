@@ -51,7 +51,7 @@
         $().ready(function(){
             $("#buttons").append("<input type='button' id='btnTestEvent' value='Fire Test Event' />");
             $("#btnTestEvent").on("click", function(){
-                var evt = { "eventType": "test-event", "clientSideTime": new Date() };
+                var evt = { "eventType": "test-event", "clientId": "client-01", "clientSideTime": new Date() };
                 publishEvent(evt);
             });
 

@@ -1,45 +1,78 @@
 'use strict';
 
-//const AWS = require('aws-sdk');
-//const docClient = new AWS.DynamoDB.DocumentClient();
+const AWS = require('aws-sdk');
+var Result = require("./result");
+
+
+const docClient = new AWS.DynamoDB.DocumentClient({ 
+    endpoint: `${process.env.DYNAMODB_HOST}:${process.env.DYNAMODB_PORT}`,
+    region: `${process.env.DYNAMODB_REGION}`
+ });
 
 module.exports.applyLocalResultToStoredResult = (localResult, rule) => { 
-    const remoteResult = module.exports.getResult(localResult.uniqueResultKey);
-    const combinedResult = remoteResult.mergeResult(localResult);
-
-    // TODO: truncate events based on window for rule
-
-    module.exports.saveResult(combinedResult);
-    return combinedResult;
+    return module.exports.getResult(localResult.uniqueResultKey)
+        .then((remoteResult) => {
+            if(remoteResult !== null){
+                return remoteResult.mergeResult(localResult);
+                // TODO: truncate events based on window for rule
+            }
+            else{
+                return localResult;
+            }
+        })
+        .then((result) => {
+            return module.exports.saveResult(result)
+                .then((_unusedResponse) => {
+                    return result;
+                });
+        });
 };
 
 module.exports.getResult = (uniqueResultKey) => {
-    return temporaryStorage[uniqueResultKey];
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE_NAME_RESULTS,
+        Key: {
+            'unique_result_key': uniqueResultKey
+        }
+    };
+
+    console.log(`DynamoDB - Retrieving ${uniqueResultKey}`);
+    return docClient.get(params).promise()
+        .then((rawResult) => {
+            if(rawResult["Item"]){
+                const i = rawResult["Item"];
+                console.log(`DynamoDB - Retrieving ${uniqueResultKey}: Success ${i.events.length} events`);
+                return new Result(i.unique_result_key, i.client_id, i.rule_id, i.events);
+            }
+            else{
+                console.log(`DynamoDB - Retrieving ${uniqueResultKey}: Does not exist`);
+                return null;
+            }
+        });
 };
 
 module.exports.saveResult = (result) => { 
-    temporaryStorage[result.uniqueResultKey] = result;
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE_NAME_RESULTS,
+        Key: {
+            'unique_result_key': result.uniqueResultKey
+        },
+        UpdateExpression: "set client_id = :clientId, rule_id = :ruleId, events = :events, updated = :updated",
+//        ConditionExpression: "",    // future note if needed: https://forums.aws.amazon.com/thread.jspa?threadID=239939
+        ExpressionAttributeValues: {
+            ':clientId': result.clientId,
+            ':ruleId': result.ruleId,
+            ':events': result.events,
+            ':updated': new Date().toISOString()
+        },
+        ReturnValues:"UPDATED_NEW"
+    };
 
-    //TODO: DynamoDB + Dynalite
-    // const params = {
-    //     TableName: env.process.DYNAMODB_TABLE_NAME_RESULTS,
-    //     Key: {
-    //         'uniqueResultsKey': result.uniqueResultKey
-    //     },
-    //     UpdateExpression: "set clientId = :clientId, ruleId = :ruleId, events = :events, updated = :updated",
-    //     ConditionExpression: "",    // future note if needed: https://forums.aws.amazon.com/thread.jspa?threadID=239939
-    //     ExpressionAttributeValues: {
-    //         'clientId': result.clientId,
-    //         'ruleId': result.ruleId,
-    //         'events': results.events,
-    //         'updated': new Date()
-    //     },
-    //     ReturnValues:"UPDATED_NEW"
-    // };
-
-    // console.log("Attempting a conditional update...");
-    // return docClient.update(params).promise();
+    console.log(`DynamoDB - Storing ${result.uniqueResultKey}`);
+    return docClient.update(params).promise()
+        .then((_unusedResponse) => {
+            console.log(`DynamoDB - Storing ${result.uniqueResultKey}: Success`);
+            // TODO do something with update response
+            return _unusedResponse;
+        });
 };
-
-// this is in memory, works temporarily for offline dev access by ruleProcessor only
-const temporaryStorage = {};
