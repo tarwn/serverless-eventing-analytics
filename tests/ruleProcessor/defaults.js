@@ -20,7 +20,14 @@ module.exports.getSampleRule = (props) => {
     var rawRule = {
         ruleName: 'unit-test-rule',
         clientId: 'default-client-id',
-        parameters: [ ]
+        where: [],
+        partitionBy: [],
+        evaluate: {
+            type: 'any',
+            having: {
+                
+            }
+        }
     };
 
     Object.keys(props).forEach((k) => { 

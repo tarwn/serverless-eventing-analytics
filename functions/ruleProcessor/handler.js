@@ -20,7 +20,7 @@ module.exports.streamProcessor = (kinesisEvent, context, callback) => {
             return results.applyLocalResultToStoredResult(localResults[uniqueResultKey], appliedRule)
                 .then((completeResult) => {
                     if (appliedRule.meetsConditionsFor(completeResult)) { 
-                        publishAlert(rule.getAlertFor(completeResult));
+                        publishAlert(appliedRule.getAlertFor(completeResult));
                         alertCount++;
                         console.log(`ALERTED for ${completeResult.uniqueResultKey}`);
                     }
@@ -41,4 +41,5 @@ module.exports.streamProcessor = (kinesisEvent, context, callback) => {
 
 function publishAlert(alert) { 
     // TODO: kinesis stream for alerts
+    console.log("Publish Alert: " + JSON.stringify(alert));
 }

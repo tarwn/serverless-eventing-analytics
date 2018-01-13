@@ -47,7 +47,7 @@ describe("applyRules", () => {
 
     it("should only include events that rule applied to", () => {
         const clientRules = [
-            defaults.getSampleRule({ parameters: [{ 'property': 'machineId', 'equivalence': 'machine-01' }] })
+            defaults.getSampleRule({ where: [{ 'property': 'machineId', 'equals': 'machine-01' }] })
         ];
         const clientEventsGroup = {
             events: [
@@ -65,9 +65,9 @@ describe("applyRules", () => {
 
     it("should add event to every rule that applies", () => {
         const clientRules = [
-            defaults.getSampleRule({ ruleId: 'rule-00', parameters: [{ 'property': 'machineId', 'equivalence': '*' }] }),
-            defaults.getSampleRule({ ruleId: 'rule-01', parameters: [{ 'property': 'machineId', 'equivalence': '*' }] }),
-            defaults.getSampleRule({ ruleId: 'rule-02', parameters: [{ 'property': 'machineId', 'equivalence': '*' }] })
+            defaults.getSampleRule({ ruleId: 'rule-00', where: [{ 'property': 'machineId', 'equals': '*' }] }),
+            defaults.getSampleRule({ ruleId: 'rule-01', where: [{ 'property': 'machineId', 'equals': '*' }] }),
+            defaults.getSampleRule({ ruleId: 'rule-02', where: [{ 'property': 'machineId', 'equals': '*' }] })
         ];
         const clientEventsGroup = {
             events: [
@@ -87,8 +87,8 @@ describe("applyRules", () => {
 
     it("should only return rules that were applied", () => {
         const clientRules = [
-            defaults.getSampleRule({ parameters: [{ 'property': 'machineId', 'equivalence': '*' }] }),
-            defaults.getSampleRule({ parameters: [{ 'property': 'somethingElse', 'equivalence': '*' }] })
+            defaults.getSampleRule({ where: [{ 'property': 'machineId', 'equals': '*' }] }),
+            defaults.getSampleRule({ where: [{ 'property': 'somethingElse', 'equals': '*' }] })
         ];
         const clientEventsGroup = {
             events: [
