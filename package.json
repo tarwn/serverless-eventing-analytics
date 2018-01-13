@@ -21,7 +21,7 @@
     "dotenv": "^4.0.0",
     "js-yaml": "^3.10.0",
     "mocha": "^4.1.0",
-    "serverless-dynalite": "^1.2.0",
+    "serverless-dynalite": "git+https://github.com/tarwn/serverless-dynalite.git#package",
     "serverless-offline": "^3.16.0"
   },
   "scripts": {
