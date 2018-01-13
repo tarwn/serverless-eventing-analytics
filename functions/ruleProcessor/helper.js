@@ -1,6 +1,7 @@
 'use strict';
 
 var Result = require("./lib/result");
+var EventGroup = require("./lib/eventGroup");
 
 module.exports.extractEventsFromKinesisEvent = (kinesisEvent) => {
     return kinesisEvent.Records.map((record) => {
@@ -12,15 +13,12 @@ module.exports.groupEventsByClient = (events) => {
     const clientEventsByClient = {};
     events.forEach((event) => {
         const clientIndex = `client:${event.clientId}`;
-
         if (clientEventsByClient[clientIndex] === undefined) {
-            clientEventsByClient[clientIndex] = {
-                clientId: event.clientId,
-                events: []
-            };
-            clientEventsByClient[clientIndex].events.push(event);
+            clientEventsByClient[clientIndex] = new EventGroup(event.clientId);
         }
+        clientEventsByClient[clientIndex].addEvent(event);
     });
+    // flatten to array
     return Object.keys(clientEventsByClient)
         .map((clientIndex) => clientEventsByClient[clientIndex]);
 };
@@ -41,5 +39,7 @@ module.exports.applyRules = (clientRules, clientEventsGroup) => {
         });
     });
 
-    return localRuleResults;
+    // flatten to array and return
+    return Object.keys(localRuleResults)
+        .map((uniqueRuleKey) => localRuleResults[uniqueRuleKey]);
 };

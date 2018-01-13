@@ -58,9 +58,8 @@ describe("applyRules", () => {
 
         var results = helper.applyRules(clientRules, clientEventsGroup);
 
-        var rulesApplied = Object.keys(results);
-        assert.lengthOf(rulesApplied, 1, "Should have 1 rule entry");
-        assert.lengthOf(results[rulesApplied[0]].events, 1, "Should have 1 event in rule entry");
+        assert.lengthOf(results, 1, "Should have 1 rule entry");
+        assert.lengthOf(results[0].events, 1, "Should have 1 event in rule entry");
     });
 
     it("should add event to every rule that applies", () => {
@@ -98,7 +97,6 @@ describe("applyRules", () => {
 
         var results = helper.applyRules(clientRules, clientEventsGroup);
 
-        var rulesApplied = Object.keys(results);
-        assert.lengthOf(rulesApplied, 1, "Should have 1 rule entry");
+        assert.lengthOf(results, 1, "Should have 1 rule entry");
     });
 });
