@@ -43,5 +43,25 @@ module.exports = function() {
         });
     });
 
+    app.post("/alert-api/alerts", function(req, res){
+        const incomingAlert = req.body;
+        console.log(`Received an alert ${incomingAlert}`);
+
+        var putReq = kinesis.putRecord({
+            Data: JSON.stringify(incomingAlert),
+            PartitionKey: '0',
+            StreamName: process.env.KINESIS_STREAM_NAME_ALERTS
+        }, function (err, data) { 
+            if (err) {
+                //TODO: details somewhere
+                console.log(err);
+                res.status(500).send("Error writing to kinesis");
+            }
+            else { 
+                res.status(200).send("Ok");
+            }
+        });
+    });
+
     return app;
 };

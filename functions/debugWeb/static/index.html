@@ -48,11 +48,34 @@
             });
         }
 
+        function publishAlert(event,){
+            var data = JSON.stringify(event);
+            var logId = log("Sending: " + data);
+            $.ajax({
+                type: "POST",
+                url: "alert-api/alerts",
+                contentType: "application/json; charset=utf-8",
+                data: data,
+                success: function(data){
+                    log("Success: " + data, logId);
+                },
+                error: function(jqXHR, status, error){
+                    log("Error: " + jqXHR.status + " " + status, logId);
+                }
+            });
+        }
+
         $().ready(function(){
             $("#buttons").append("<input type='button' id='btnTestEvent' value='Fire Test Event' />");
             $("#btnTestEvent").on("click", function(){
                 var evt = { "eventType": "test-event", "clientId": "client-01", "clientSideTime": new Date() };
                 publishEvent(evt);
+            });
+
+            $("#buttons").append("<input type='button' id='btnTestAlert' value='Fire Test Alert' />");
+            $("#btnTestAlert").on("click", function(){
+                var evt = { "clientId": "client-01", "rule-id": "rule-01", "event": { "eventType": "test-event", "clientId": "client-01", "clientSideTime": new Date() } };
+                publishAlert(evt);
             });
 
             $("#buttons").append("<input type='button' id='btnToggleAnimation' value='Stop Running' />");
@@ -90,8 +113,7 @@
                 });
             });
 
-            // begin running machines - same sequence of events for both clients
-            isRunning = true;
+            // begin running machines bg loop - same sequence of events for both clients
             animate();
 
             function animate(){
