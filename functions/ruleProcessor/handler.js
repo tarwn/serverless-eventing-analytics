@@ -4,6 +4,14 @@ const helper = require('./helper');
 const rules = require('./lib/rules');
 const results = require('./lib/results');
 
+var AWS = require('aws-sdk');    
+const kinesis = new AWS.Kinesis({
+    endpoint: `${process.env.KINESIS_HOST}:${process.env.KINESIS_PORT}`,
+    region: process.env.KINESIS_REGION,
+    apiVersion: '2013-12-02',
+    sslEnabled: false
+});
+
 module.exports.streamProcessor = (kinesisEvent, context, callback) => {
     const events = helper.extractEventsFromKinesisEvent(kinesisEvent);
     const eventGroups = helper.groupEventsByClient(events);
@@ -16,11 +24,16 @@ module.exports.streamProcessor = (kinesisEvent, context, callback) => {
     .then((nestedAlerts) => {
         var alerts = flatten(nestedAlerts);
 
-        alerts.forEach((alert) => {
-            publishAlert(alert);
+        const publishAlerts = alerts.map((alert) => {
+            return publishAlert(alert);
         });
-
-        callback(null, `Successfully processed ${kinesisEvent.Records.length} records for ${eventGroups.length} clients, resulting in ${alerts.length} alerts`);
+        return Promise.all(publishAlerts);
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    .then((publishedAlerts) => {
+        callback(null, `Successfully processed ${kinesisEvent.Records.length} records for ${eventGroups.length} clients, resulting in ${publishedAlerts.length} alerts`);
     });
 };
 
@@ -58,6 +71,9 @@ function flatten(nestedArray){
 }
 
 function publishAlert(alert) { 
-    // TODO: kinesis stream for alerts
-    console.log("Publish Alert: " + JSON.stringify(alert));
+    return kinesis.putRecord({
+        Data: JSON.stringify(alert),
+        PartitionKey: '0',
+        StreamName: process.env.KINESIS_STREAM_NAME_ALERTS
+    }).promise();
 }
