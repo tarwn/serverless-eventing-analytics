@@ -10,19 +10,19 @@
     "node": ">=6.5 <=6.12.3"
   },
   "dependencies": {
-    "express": "^4.16.2",
-    "serverless-http": "^1.5.2",
-    "aws-sdk": "^2.176.0"
+    "aws-sdk": "^2.229.1",
+    "express": "^4.16.3",
+    "serverless-http": "^1.5.5"
   },
   "devDependencies": {
     "@rabblerouser/local-kinesis-lambda-runner": "git+https://github.com/tarwn/local-kinesis-lambda-runner.git#package",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",
-    "js-yaml": "^3.10.0",
+    "js-yaml": "^3.11.0",
     "mocha": "^4.1.0",
     "serverless-dynalite": "git+https://github.com/tarwn/serverless-dynalite.git#package",
-    "serverless-offline": "^3.16.0"
+    "serverless-offline": "^3.20.3"
   },
   "scripts": {
     "test": "mocha tests/**/*.js",
